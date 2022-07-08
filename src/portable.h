@@ -65,6 +65,28 @@ std::wstring GetDiskCacheDir()
     return temp;
 }
 
+std::wstring GetExtensionsDir()
+{
+    std::wstring path = GetAppDir() + L"\\..\\Extensions";
+
+    TCHAR temp[MAX_PATH];
+    ::PathCanonicalize(temp, path.data());
+
+    return temp;
+}
+
+std::wstring GetProfileExtensionsDir(std::wstring profile_name)
+{
+    std::wstring path = GetUserDataDir();
+    path.append(L"\\").append(profile_name).append(L"\\Extensions");
+
+    TCHAR temp[MAX_PATH];
+    ::PathCanonicalize(temp, path.data());
+
+    return temp;
+}
+
+
 // 构造新命令行
 std::wstring GetCommand(LPWSTR param)
 {
@@ -86,21 +108,34 @@ std::wstring GetCommand(LPWSTR param)
         }
         insert_pos = i;
     }
+
+    std::wstring profileName = L"Default";
+
     for (int i = 0; i < argc; i++)
     {
         // 保留原来参数
         if(i)
             args.push_back(argv[i]);
 
+        if (wcsstr(argv[i], L"--profile-directory=")) {
+            wchar_t* arg = argv[i];
+            wchar_t delim[] = L"="; 
+            wchar_t* pt;
+            wchar_t* tmpArg = wcstok(arg, delim, &pt);
+            tmpArg = wcstok(NULL, delim, &pt);
+            profileName = tmpArg;
+        }
+
         // 追加参数
         if (i == insert_pos)
         {
             args.push_back(L"--shuax");
+            args.push_back(L"--disable-quic");
 
             // args.push_back(L"--force-local-ntp");
             // args.push_back(L"--disable-background-networking");
 
-            args.push_back(L"--disable-features=RendererCodeIntegrity,FlashDeprecationWarning");
+            args.push_back(L"--disable-features=RendererCodeIntegrity,FlashDeprecationWarning,SidePanel");
 
             //if (IsNeedPortable())
             {
@@ -115,6 +150,34 @@ std::wstring GetCommand(LPWSTR param)
 
                 wchar_t temp[MAX_PATH];
                 wsprintf(temp, L"--user-data-dir=%s", userdata.c_str());
+                args.push_back(temp);
+            }
+
+            auto extPath = GetExtensionsDir();
+            auto proExtPath = GetProfileExtensionsDir(profileName);
+
+            std::vector<std::wstring> extList;
+
+            GetExtensionsList(extPath.c_str(), extList);
+            GetExtensionsList(proExtPath.c_str(), extList);
+
+            if (extList.size()) {
+                std::wstring text;
+                bool first = true;
+                for (auto &line : extList)
+                {
+                    if (!first)
+                        text += ',';
+                    else
+                        first = false;
+                    text += line;
+                }
+                
+                // WriteLog(L"extList: %s", text.c_str());
+
+                wchar_t temp[800];
+                wsprintf(temp, L"--load-extension=%s", text.c_str());
+                // WriteLog(L"extList: %s", temp);
                 args.push_back(temp);
             }
         }

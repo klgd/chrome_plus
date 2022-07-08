@@ -23,7 +23,7 @@ Startup ExeMain = NULL;
 void ChromePlus()
 {
     // 快捷方式
-    SetAppId();
+    // SetAppId();
 
     // 便携化补丁
     MakeGreen();

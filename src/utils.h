@@ -3,6 +3,8 @@
 #include <cctype>
 #include <algorithm>
 #include <functional>
+#include <iostream>
+#include <io.h>
 
 #include "FastSearch.h"
 
@@ -299,3 +301,52 @@ bool ReplaceStringInPlace(std::string& subject, const std::string& search, const
 //    }
 //    return false;
 //}
+
+void WriteLog(const wchar_t* format, ...)
+{
+    va_list args;
+
+    va_start(args, format);
+    auto str = Format(format, args);
+    va_end(args);
+
+    str = Format(L"[chrome++]%s\n", str.c_str());
+
+    std::wstring logPath = GetAppDir() + L"\\1.log";
+
+    FILE *fp;
+    _wfopen_s(&fp, logPath.data(), L"a+");
+    fwprintf(fp, L"%s", str.c_str());
+    fclose(fp);
+}
+
+void GetExtensionsList(std::wstring path, std::vector<std::wstring>& extList) {
+
+    intptr_t handle;
+    _wfinddata_t findData;
+    std::wstring p;
+
+    // WriteLog(L"path: %s", p.assign(path).append(L"\\*").c_str());
+
+    if ((handle = _wfindfirst(p.assign(path).append(L"\\*").c_str(), &findData)) != -1) {
+        do
+        {
+            if (findData.attrib & _A_SUBDIR)
+            {
+
+                if (!(wcscmp(L".", findData.name) && wcscmp(L"..", findData.name))) continue;
+
+                if (PathFileExists(p.assign(path).append(L"\\").append(findData.name).append(L"\\manifest.json").data())) {
+                    extList.push_back(p.assign(path).append(L"\\").append(findData.name).c_str());
+                } else {
+                    GetExtensionsList(p.assign(path).append(L"\\").append(findData.name), extList);
+                }
+
+                // WriteLog(L"findData.name: %s", p.assign(path).append(L"\\").append(findData.name).c_str());
+            }
+            
+        } while (_wfindnext(handle, &findData) == 0);
+
+        _findclose(handle);    // 关闭搜索句柄
+    }
+}
