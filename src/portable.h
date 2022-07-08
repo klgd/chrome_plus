@@ -117,14 +117,14 @@ std::wstring GetCommand(LPWSTR param)
         if(i)
             args.push_back(argv[i]);
 
-        if (wcsstr(argv[i], L"--profile-directory=")) {
-            wchar_t* arg = argv[i];
-            wchar_t delim[] = L"="; 
-            wchar_t* pt;
-            wchar_t* tmpArg = wcstok(arg, delim, &pt);
-            tmpArg = wcstok(NULL, delim, &pt);
-            profileName = tmpArg;
-        }
+        // if (wcsstr(argv[i], L"--profile-directory=")) {
+        //     wchar_t* arg = argv[i];
+        //     wchar_t delim[] = L"="; 
+        //     wchar_t* pt;
+        //     wchar_t* tmpArg = wcstok(arg, delim, &pt);
+        //     tmpArg = wcstok(NULL, delim, &pt);
+        //     profileName = tmpArg;
+        // }
 
         // 追加参数
         if (i == insert_pos)
@@ -153,33 +153,33 @@ std::wstring GetCommand(LPWSTR param)
                 args.push_back(temp);
             }
 
-            auto extPath = GetExtensionsDir();
-            auto proExtPath = GetProfileExtensionsDir(profileName);
+            // auto extPath = GetExtensionsDir();
+            // auto proExtPath = GetProfileExtensionsDir(profileName);
 
-            std::vector<std::wstring> extList;
+            // std::vector<std::wstring> extList;
 
-            GetExtensionsList(extPath.c_str(), extList);
-            GetExtensionsList(proExtPath.c_str(), extList);
+            // GetExtensionsList(extPath.c_str(), extList);
+            // GetExtensionsList(proExtPath.c_str(), extList);
 
-            if (extList.size()) {
-                std::wstring text;
-                bool first = true;
-                for (auto &line : extList)
-                {
-                    if (!first)
-                        text += ',';
-                    else
-                        first = false;
-                    text += line;
-                }
+            // if (extList.size()) {
+            //     std::wstring text;
+            //     bool first = true;
+            //     for (auto &line : extList)
+            //     {
+            //         if (!first)
+            //             text += ',';
+            //         else
+            //             first = false;
+            //         text += line;
+            //     }
                 
-                // WriteLog(L"extList: %s", text.c_str());
+            //     // WriteLog(L"extList: %s", text.c_str());
 
-                wchar_t temp[800];
-                wsprintf(temp, L"--load-extension=%s", text.c_str());
-                // WriteLog(L"extList: %s", temp);
-                args.push_back(temp);
-            }
+            //     wchar_t temp[800];
+            //     wsprintf(temp, L"--load-extension=%s", text.c_str());
+            //     // WriteLog(L"extList: %s", temp);
+            //     args.push_back(temp);
+            // }
         }
     }
     LocalFree(argv);
