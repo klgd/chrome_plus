@@ -109,7 +109,7 @@ std::wstring GetCommand(LPWSTR param)
         insert_pos = i;
     }
 
-    std::wstring profileName = L"Default";
+    // std::wstring profileName = L"Default";
 
     for (int i = 0; i < argc; i++)
     {
@@ -153,33 +153,33 @@ std::wstring GetCommand(LPWSTR param)
                 args.push_back(temp);
             }
 
-            // auto extPath = GetExtensionsDir();
+            auto extPath = GetExtensionsDir();
             // auto proExtPath = GetProfileExtensionsDir(profileName);
 
-            // std::vector<std::wstring> extList;
+            std::vector<std::wstring> extList;
 
-            // GetExtensionsList(extPath.c_str(), extList);
+            GetExtensionsList(extPath.c_str(), extList);
             // GetExtensionsList(proExtPath.c_str(), extList);
 
-            // if (extList.size()) {
-            //     std::wstring text;
-            //     bool first = true;
-            //     for (auto &line : extList)
-            //     {
-            //         if (!first)
-            //             text += ',';
-            //         else
-            //             first = false;
-            //         text += line;
-            //     }
+            if (extList.size()) {
+                std::wstring text;
+                bool first = true;
+                for (auto &line : extList)
+                {
+                    if (!first)
+                        text += ',';
+                    else
+                        first = false;
+                    text += line;
+                }
                 
-            //     // WriteLog(L"extList: %s", text.c_str());
+                // WriteLog(L"extList: %s", text.c_str());
 
-            //     wchar_t temp[800];
-            //     wsprintf(temp, L"--load-extension=%s", text.c_str());
-            //     // WriteLog(L"extList: %s", temp);
-            //     args.push_back(temp);
-            // }
+                wchar_t temp[800];
+                wsprintf(temp, L"--load-extension=%s", text.c_str());
+                // WriteLog(L"extList: %s", temp);
+                args.push_back(temp);
+            }
         }
     }
     LocalFree(argv);
